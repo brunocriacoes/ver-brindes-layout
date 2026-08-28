@@ -34,13 +34,28 @@ function filterProducts() {
 }
 searchForm.addEventListener('submit', event => { event.preventDefault(); filterProducts(); document.getElementById('destaques').scrollIntoView({ behavior: 'smooth' }); });
 searchInput.addEventListener('input', filterProducts);
-const slides = [...document.querySelectorAll('.hero-slide')];
-const dots = [...document.querySelectorAll('.slider-dots button')];
-let currentSlide = 0;
-function showSlide(index) {
-  currentSlide = (index + slides.length) % slides.length;
-  slides.forEach((slide, i) => slide.classList.toggle('active', i === currentSlide));
-  dots.forEach((dot, i) => dot.classList.toggle('active', i === currentSlide));
+const parallaxHero = document.querySelector('.parallax-hero');
+const parallaxProducts = [...document.querySelectorAll('.parallax-product')];
+if (parallaxHero && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  parallaxHero.addEventListener('pointermove', event => {
+    const bounds = parallaxHero.getBoundingClientRect();
+    const x = (event.clientX - bounds.left) / bounds.width - .5;
+    const y = (event.clientY - bounds.top) / bounds.height - .5;
+    parallaxProducts.forEach((product, index) => {
+      const depth = (index + 1) * 9;
+      product.style.setProperty('--parallax-x', `${x * depth}px`);
+      product.style.setProperty('--parallax-y', `${y * depth}px`);
+    });
+  });
+  parallaxHero.addEventListener('pointerleave', () => parallaxProducts.forEach(product => { product.style.setProperty('--parallax-x', '0px'); product.style.setProperty('--parallax-y', '0px'); }));
+  let scrollFrame;
+  window.addEventListener('scroll', () => {
+    if (scrollFrame) return;
+    scrollFrame = requestAnimationFrame(() => {
+      const bounds = parallaxHero.getBoundingClientRect();
+      const offset = Math.max(-65, Math.min(65, -bounds.top * .18));
+      parallaxHero.style.setProperty('--scroll-y', `${offset}px`);
+      scrollFrame = null;
+    });
+  }, { passive: true });
 }
-dots.forEach((dot, index) => dot.addEventListener('click', () => showSlide(index)));
-setInterval(() => showSlide(currentSlide + 1), 5000);
