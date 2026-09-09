@@ -2,7 +2,7 @@ const body = document.body;
 const theme = document.getElementById('theme-toggle');
 const menu = document.getElementById('menu-toggle');
 const nav = document.getElementById('nav');
-document.querySelectorAll('a:not([data-legal]):not([data-contact])').forEach(link => link.setAttribute('href', '#'));
+document.querySelectorAll('a:not([data-legal]):not([data-contact]):not([data-page])').forEach(link => link.setAttribute('href', '#'));
 let size = Number(localStorage.getItem('ver-font-size') || 16);
 
 function setSize(value) {
@@ -59,3 +59,4 @@ if (parallaxHero && !window.matchMedia('(prefers-reduced-motion: reduce)').match
     });
   }, { passive: true });
 }
+
